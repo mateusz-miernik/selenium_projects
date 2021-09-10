@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from argparse import ArgumentParser, Namespace
 from time import sleep
+from pathlib import Path
 
 
 class TestEbookDownloading:
@@ -42,22 +43,14 @@ class TestEbookDownloading:
     def test_ebook_downloading(self, driver, wait, stringinput):
         driver.maximize_window()
         driver.get("https://www.salesmanago.com/")
-        cookies_permission = wait.until(EC.element_to_be_clickable((By.ID, 'close-cookies')))   # close cookies message
+        cookies_permission = wait.until(EC.element_to_be_clickable((By.ID, 'close-cookies')))  # close cookies message
         cookies_permission.click()
-        # driver.find_element_by_id("close-cookies").click()
-        # sleep(60)
-        # resources_page = \
-        #     wait.until(EC.element_to_be_clickable((By.XPATH,
-        #                                            "/html/body/nav/section/nav/div/div/ul/li[5]/a")))
+
         resources_page = \
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
                                                    'body > nav > section > nav > div > div > ul > li:nth-child(5)')))
         resources_page.click()
-        # sleep(60)
-        # ebooks_page = \
-        #     wait.until(EC.element_to_be_clickable((By.XPATH,
-        #                                            "/html/body/nav/section/nav/div/div/ul/li[5]/"
-        #                                            "div/div/div/div[2]/div/div[1]/ul/li[2]")))
+
         ebooks_page = \
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
                                                    'body > nav > section > nav > div > div > ul > li:nth-child(5) '
@@ -65,7 +58,54 @@ class TestEbookDownloading:
                                                    '> li:nth-child(2) > a')))
         ebooks_page.click()
 
-        assert stringinput == "ebook"
+        ebook_elements = driver.find_elements_by_class_name("ebook__img--container")
+        ebook_names = [Path(element.get_attribute('href')).stem
+                       for element in driver.find_elements_by_css_selector('div.ebook__img--container a')]
+
+        all_ebooks = {ebook_name: ebook_element for (ebook_name, ebook_element) in zip(ebook_names, ebook_elements)}
+
+        for idx, ebook in enumerate(all_ebooks.items(), start=1):
+            print(f"{idx}: {ebook}")
+
+        declared_ebook = all_ebooks[stringinput]
+        declared_ebook.click()
+
+        # sleep(2)
+        print(driver.window_handles)
+        driver.switch_to.window(driver.window_handles[1])
+
+        #   Different entry forms service needs to be added
+        name_and_surname = \
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                                   '#uspForm > div:nth-child(2) > div:nth-child(1) > div > input')))
+        name_and_surname.click()
+        name_and_surname.send_keys("Mateusz Miernik")
+
+        email = \
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#email')))
+        email.click()
+        email.send_keys("mateusz.miernik.benhauer+testrekrutacja@salesmanago.com")
+
+        company = \
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#company > div > input')))
+        company.click()
+        company.send_keys("The Best Company")
+
+        website = \
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#uspForm > div:nth-child(2) > div:nth-child(4) '
+                                                                    '> div > input')))
+        website.click()
+        website.send_keys("https://www.google.com")
+
+        phone_number = \
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#phoneNumber')))
+        phone_number.click()
+        phone_number.send_keys("501401301")
+
+        button = driver.find_element_by_css_selector('#uspForm > div:nth-child(3) > div > button')
+        button.click()
+
+        sleep(10)
 
 
 def main() -> None:
