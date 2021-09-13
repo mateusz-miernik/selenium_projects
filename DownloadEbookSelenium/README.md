@@ -1,12 +1,20 @@
 # Title
 
-Test for downloading ebooks from https://www.salesmanago.com written in Python and Selenium library.
+Test for downloading ebooks from https://www.salesmanago.com written in Python (Pytest) and Selenium library.
 
 # Requirements
 
 * `python 3.9`
 * `selenium 3.141.0`
 * `pytest 6.2.5`
+
+# Before you start
+
+Make sure to read this entire documentation first before trying to execute any commands listed below to get an
+understanding of how this utility works, instead of blindly copying and pasting commands into the terminal.
+
+If things like `virtualenv` or `pip` are not clear for you, make sure to read about them or ask your coworkers. Its your
+responsibility to troubleshoot any problems directly related to basic stuff (like above mentioned `virtualenv` or `pip`).
 
 # Installation
 
@@ -63,7 +71,7 @@ and add this location to windows PATH.
 
 You need to invoke command window in location of project files and then write:
 ```commandline
-pytest --stringinput name_of_ebook
+pytest --stringinput ebook_name
 ```
 
 # Run scenario without pytest
