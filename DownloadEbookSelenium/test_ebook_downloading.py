@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 from argparse import ArgumentParser, Namespace
 from time import sleep
 from pathlib import Path
@@ -46,10 +47,10 @@ class TestEbookDownloading:
         cookies_permission = wait.until(EC.element_to_be_clickable((By.ID, 'close-cookies')))  # close cookies message
         cookies_permission.click()
 
-        resources_page = \
+        resources_section = \
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
                                                    'body > nav > section > nav > div > div > ul > li:nth-child(5)')))
-        resources_page.click()
+        resources_section.click()
 
         ebooks_page = \
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
@@ -70,42 +71,36 @@ class TestEbookDownloading:
         declared_ebook = all_ebooks[stringinput]
         declared_ebook.click()
 
-        # sleep(2)
         print(driver.window_handles)
         driver.switch_to.window(driver.window_handles[1])
 
-        #   Different entry forms service needs to be added
-        name_and_surname = \
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,
-                                                   '#uspForm > div:nth-child(2) > div:nth-child(1) > div > input')))
+        name_and_surname = wait.until(EC.element_to_be_clickable((By.NAME, 'name')))
         name_and_surname.click()
         name_and_surname.send_keys("Mateusz Miernik")
 
-        email = \
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#email')))
+        email = wait.until(EC.element_to_be_clickable((By.NAME, 'email')))
         email.click()
         email.send_keys("mateusz.miernik.benhauer+testrekrutacja@salesmanago.com")
 
-        company = \
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#company > div > input')))
+        company = wait.until(EC.element_to_be_clickable((By.NAME, 'company')))
         company.click()
         company.send_keys("The Best Company")
 
-        website = \
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#uspForm > div:nth-child(2) > div:nth-child(4) '
-                                                                    '> div > input')))
+        website = wait.until(EC.element_to_be_clickable((By.NAME, 'url')))
         website.click()
         website.send_keys("https://www.google.com")
 
-        phone_number = \
-            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#phoneNumber')))
+        phone_number = wait.until(EC.element_to_be_clickable((By.NAME, 'phoneNumber')))
         phone_number.click()
         phone_number.send_keys("501401301")
 
-        button = driver.find_element_by_css_selector('#uspForm > div:nth-child(3) > div > button')
-        button.click()
+        try:
+            button = driver.find_element_by_css_selector('.btn.center-block.form-btn.form-btn')
+        except NoSuchElementException:
+            button = driver.find_element_by_css_selector('.btn.btn-success')
 
-        sleep(10)
+        button.click()
+        sleep(3)
 
 
 def main() -> None:
